@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="max-w-4xl mx-auto py-20 px-6 min-h-screen">
+    <a href="/" class="text-slate-500 text-xs font-bold uppercase mb-12 block hover:text-white">← Dashboard</a>
+    <h1 class="text-6xl font-black mb-8 tracking-tight">AI <span class="gradient-text">Counselor</span></h1>
+    
+    <div id="chatBox" class="glass-card p-8 rounded-[40px] h-[400px] overflow-y-auto mb-6 flex flex-col gap-4">
+        <div class="bg-slate-800/50 p-4 rounded-2xl max-w-[80%] self-start text-sm">
+            Hello! I am your LOGRA Career Counselor. Ask me anything about your future.
+        </div>
+    </div>
+
+    <div class="flex gap-4">
+        <input type="text" id="chatInput" placeholder="Ask a question..." class="flex-1 bg-slate-900 border border-slate-800 p-5 rounded-3xl outline-none focus:border-emerald-500">
+        <button onclick="askCounselor()" class="bg-emerald-600 px-10 py-5 rounded-3xl font-black uppercase text-xs tracking-widest">Ask</button>
+    </div>
+</main>
+
+<script>
+async function askCounselor() {
+    const input = document.getElementById('chatInput');
+    const chatBox = document.getElementById('chatBox');
+    if(!input.value) return;
+
+    // Add user message to UI
+    chatBox.innerHTML += `<div class="bg-blue-600 p-4 rounded-2xl max-w-[80%] self-end text-sm font-bold text-white">${input.value}</div>`;
+    const userMsg = input.value;
+    input.value = '';
+
+    const response = await fetch('/api/logra-engine', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({feature: 'counselor', input: userMsg})
+    });
+    const result = await response.json();
+    
+    if(result.status === 'success') {
+        chatBox.innerHTML += `<div class="bg-slate-800/50 p-4 rounded-2xl max-w-[80%] self-start text-sm border border-slate-700">${result.data}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="max-w-5xl mx-auto py-20 px-6 min-h-screen">
+    <div class="mb-16">
+        <a href="/" class="text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-blue-400 transition">← Back to Dashboard</a>
+        <h1 class="text-6xl font-black mt-8 mb-4 tracking-tight">Skill <span class="gradient-text">Roadmap</span></h1>
+        <p class="text-slate-400">Transform your hobbies into a structured career path.</p>
+    </div>
+
+    <div class="flex gap-4 mb-16">
+        <input type="text" id="userInput" placeholder="What are your hobbies or skills?" class="flex-1 bg-slate-900/50 border border-slate-800 p-5 rounded-3xl outline-none focus:border-blue-500 text-lg transition-all">
+        <button onclick="runModule()" class="bg-blue-600 px-10 py-5 rounded-3xl font-black uppercase text-xs tracking-widest shadow-lg shadow-blue-600/20 hover:scale-105 transition-all">Generate</button>
+    </div>
+
+    <div id="results" class="grid gap-8"></div>
+</main>
+
+<script>
+async function runModule() {
+    const input = document.getElementById('userInput').value;
+    const res = document.getElementById('results');
+    res.innerHTML = '<div class="text-center animate-pulse py-20 text-slate-500 font-bold uppercase tracking-widest">Consulting LOGRA AI...</div>';
+
+    const response = await fetch('/api/logra-engine', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({feature: 'roadmap', input: input})
+    });
+    const data = await response.json();
+    
+    if(data.status === 'success') {
+        res.innerHTML = data.data.map(j => `
+            <div class="glass-card p-10 rounded-[40px] border border-slate-800">
+                <h3 class="text-3xl font-black mb-4">${j.title}</h3>
+                <p class="text-slate-400 mb-8">${j.reason}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-950 p-6 rounded-3xl border border-slate-800">
+                        <span class="text-blue-500 font-black text-[10px] uppercase">Step 1: Education</span>
+                        <p class="mt-2 text-white">${j.roadmap_step_1}</p>
+                    </div>
+                    <div class="bg-slate-950 p-6 rounded-3xl border border-slate-800">
+                        <span class="text-blue-500 font-black text-[10px] uppercase">Step 2: Career Entry</span>
+                        <p class="mt-2 text-white">${j.roadmap_step_2}</p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        res.innerHTML = `<div class="bg-rose-500/10 border border-rose-500 p-6 rounded-3xl text-rose-500 text-center font-bold">Error: ${data.error}</div>`;
+    }
+}
+</script>
+{% endblock %}

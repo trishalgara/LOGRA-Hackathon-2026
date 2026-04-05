@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="fixed top-6 right-6 z-50 flex gap-4 items-center">
+    {% if current_user.is_authenticated %}
+        <div class="glass-card px-4 py-2 rounded-full flex gap-4 items-center">
+            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">{{ current_user.email.split('@')[0] }}</span>
+            <a href="/logout" class="bg-rose-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase transition-transform hover:scale-105">Logout</a>
+        </div>
+    {% else %}
+        <div class="flex gap-2">
+            <a href="/login" class="text-slate-400 text-xs font-bold px-4 py-2 hover:text-white transition">Login</a>
+            <a href="/signup" class="bg-blue-600 text-white px-6 py-2 rounded-full text-[10px] font-black uppercase shadow-lg shadow-blue-600/20 hover:scale-105 transition-all">Join Free</a>
+        </div>
+    {% endif %}
+</div>
+
+<header class="pt-32 pb-24 text-center px-6 relative">
+    <div class="relative z-10 text-center">
+   <div class="relative z-10 text-center">
+    <h1 class="text-5xl md:text-7xl font-black tracking-tighter leading-none mb-6 
+               bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 
+               bg-clip-text text-transparent drop-shadow-sm">
+        LOGRA
+    </h1>
+    <div class="space-y-2">
+        <p class="text-3xl md:text-5xl font-extrabold italic tracking-tight bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+            Unlock Your Potential.
+        </p>
+        <p class="text-3xl md:text-5xl font-bold italic tracking-tight bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+            Define Your Career.
+        </p>
+    </div>
+</div>
+</div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-32">
+    {% set items = [
+        ('market-trends', 'Intelligence', 'Market Trends', 'Real-time 2026 job data.', 'rose'),
+        ('roadmap', 'Guidance', 'Skill Roadmap', 'Custom education timelines.', 'blue'),
+        ('counselor', 'Interactive', 'AI Counselor', 'Direct career consulting.', 'emerald'),
+        ('anti-career', 'Psychology', 'Anti-Career', 'Filter by what you hate.', 'amber'),
+        ('simulation', 'Gamified', 'Simulation', 'Day-in-the-life scenarios.', 'cyan')
+    ] %}
+
+    {% for link, tag, title, desc, col in items %}
+    <a href="/{{ link }}" class="glass-card p-10 rounded-[40px] hover:border-{{ col }}-500 transition-all hover:-translate-y-2 group">
+        <span class="text-{{ col }}-500 text-[11px] font-black uppercase tracking-widest">{{ tag }}</span>
+        <h3 class="text-3xl font-bold mt-2">{{ title }}</h3>
+        <p class="text-slate-500 mt-4 leading-relaxed">{{ desc }}</p>
+        <div class="mt-8 font-black text-xs text-{{ col }}-500 opacity-0 group-hover:opacity-100 transition-all">Access Intelligence →</div>
+    </a>
+    {% endfor %}
+</main>
+{% endblock %}

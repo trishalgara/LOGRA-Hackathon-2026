@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="max-w-6xl mx-auto py-20 px-6 min-h-screen">
+    <a href="/" class="text-slate-500 text-xs font-bold uppercase mb-12 block hover:text-white">← Dashboard</a>
+    <h1 class="text-6xl font-black mb-12 tracking-tight">Market <span class="gradient-text">Trends 2026</span></h1>
+    
+    <div id="trendGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="col-span-full text-center text-rose-500 animate-pulse font-bold uppercase">Fetching live market data...</div>
+    </div>
+</main>
+
+<script>
+window.onload = async () => {
+    const grid = document.getElementById('trendGrid');
+    const response = await fetch('/api/logra-engine', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({feature: 'trends', input: '2026'})
+    });
+    const result = await response.json();
+    
+    if(result.status === 'success') {
+        grid.innerHTML = result.data.map(job => `
+            <div class="glass-card p-8 rounded-[40px] hover:border-rose-500 transition-all">
+                <span class="text-rose-500 text-[10px] font-black uppercase tracking-widest">${job.sector}</span>
+                <h3 class="text-xl font-bold mt-2">${job.title}</h3>
+                <div class="flex justify-between mt-6 pt-6 border-t border-slate-800">
+                    <div class="text-xs"><p class="text-slate-500 uppercase font-black">Salary</p><p class="text-white font-bold">${job.salary}</p></div>
+                    <div class="text-xs text-right"><p class="text-slate-500 uppercase font-black">Growth</p><p class="text-emerald-400 font-bold">${job.growth}</p></div>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+</script>
+{% endblock %}

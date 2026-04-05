@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="max-w-4xl mx-auto py-20 px-6 min-h-screen">
+    <a href="/" class="text-slate-500 text-xs font-bold uppercase mb-12 block hover:text-white">← Dashboard</a>
+    <h1 class="text-6xl font-black mb-8 tracking-tight">Career <span class="gradient-text">Simulation</span></h1>
+    
+    <div id="setupScreen" class="glass-card p-10 rounded-[40px] text-center">
+        <p class="text-slate-400 mb-8 italic text-lg">Which career would you like to test drive today?</p>
+        <div class="flex gap-4">
+            <input type="text" id="roleInput" placeholder="e.g. Surgical Resident, AI Engineer, Pilot..." class="flex-1 bg-slate-950 border border-slate-800 p-5 rounded-3xl outline-none focus:border-cyan-500">
+            <button onclick="startSim()" class="bg-cyan-600 px-10 py-5 rounded-3xl font-black uppercase text-xs tracking-widest">Start Game</button>
+        </div>
+    </div>
+
+    <div id="gameConsole" class="hidden space-y-8">
+        <div class="flex justify-between items-center">
+            <span id="gameTime" class="bg-cyan-500/10 text-cyan-500 px-4 py-2 rounded-full font-black text-sm tracking-widest">9:00 AM</span>
+            <span id="gameRole" class="text-slate-500 font-bold uppercase text-xs">Role: Loading...</span>
+        </div>
+
+        <div class="glass-card p-10 rounded-[40px] border-l-4 border-cyan-500">
+            <p id="narrative" class="text-xl leading-relaxed text-white font-medium"></p>
+        </div>
+
+        <div id="choiceGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <button onclick="makeChoice('a')" id="btnA" class="bg-slate-900 border border-slate-800 p-6 rounded-3xl text-left hover:border-cyan-500 transition-all group">
+                <span class="text-cyan-500 font-black text-[10px] uppercase block mb-2">Option A</span>
+                <p id="textA" class="text-slate-300 group-hover:text-white"></p>
+            </button>
+            <button onclick="makeChoice('b')" id="btnB" class="bg-slate-900 border border-slate-800 p-6 rounded-3xl text-left hover:border-cyan-500 transition-all group">
+                <span class="text-cyan-500 font-black text-[10px] uppercase block mb-2">Option B</span>
+                <p id="textB" class="text-slate-300 group-hover:text-white"></p>
+            </button>
+        </div>
+
+        <button onclick="location.reload()" class="text-slate-500 text-xs font-bold uppercase block mx-auto pt-10 hover:text-white">Quit Simulation</button>
+    </div>
+</main>
+
+<script>
+let currentSimData = null;
+
+async function startSim() {
+    const role = document.getElementById('roleInput').value;
+    if(!role) return;
+
+    document.getElementById('setupScreen').classList.add('hidden');
+    document.getElementById('gameConsole').classList.remove('hidden');
+    document.getElementById('gameRole').innerText = `Role: ${role}`;
+    
+    await fetchUpdate(role);
+}
+
+async function fetchUpdate(input) {
+    const response = await fetch('/api/logra-engine', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({feature: 'simulation', input: input})
+    });
+    const result = await response.json();
+    
+    if(result.status === 'success') {
+        currentSimData = result.data;
+        document.getElementById('gameTime').innerText = currentSimData.time;
+        document.getElementById('narrative').innerText = currentSimData.narrative;
+        document.getElementById('textA').innerText = currentSimData.choice_a;
+        document.getElementById('textB').innerText = currentSimData.choice_b;
+    }
+}
+
+function makeChoice(letter) {
+    const consequence = letter === 'a' ? currentSimData.consequence_a : currentSimData.consequence_b;
+    
+    // Show Consequence in narrative
+    document.getElementById('narrative').innerHTML = `<span class="text-cyan-500 font-bold block mb-4 italic">Result: ${consequence}</span>` + 
+                                                     "The day continues...";
+    
+    // Disable buttons briefly to feel "real"
+    document.getElementById('btnA').disabled = true;
+    document.getElementById('btnB').disabled = true;
+
+    setTimeout(() => {
+        const role = document.getElementById('gameRole').innerText.replace('Role: ', '');
+        fetchUpdate(`Continue simulation for ${role} after this happened: ${consequence}`);
+        document.getElementById('btnA').disabled = false;
+        document.getElementById('btnB').disabled = false;
+    }, 2000);
+}
+</script>
+{% endblock %}

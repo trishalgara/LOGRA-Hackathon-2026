@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #020617; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .bg-grid { 
+            background-image: radial-gradient(circle, #1e293b 1px, transparent 1px); 
+            background-size: 35px 35px; 
+        }
+        .glass-card { 
+            background: rgba(15, 23, 42, 0.7); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(51, 65, 85, 0.4); 
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #60a5fa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-grid">
+    {% block content %}{% endblock %}
+</body>
+</html>
